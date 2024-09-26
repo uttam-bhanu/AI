@@ -1,0 +1,86 @@
+
+How to debug server startup
+---------------------------
+
+           # to debug server at startup, before listen loop:
+           SQLSRV2_SPINWAIT=y;export SQLSRV2_SPINWAIT=y
+           TPE_BE_SPINWAIT=true;   export TPE_BE_SPINWAIT
+
+           # turn on verbose logging of sqlsrv top-level, including startup params:
+           SQLSRV2_DEBUG=True;export SQLSRV2_DEBUG
+
+
+How to trace server execution
+------------------------------
+              
+           # how much info tracing will dump:
+           unset TPELOGLEVEL                             # log the least info.
+           TPELOGLEVEL=LOG_1; export TPELOGLEVEL         # log minimal   info.
+           TPELOGLEVEL=LOG_3; export TPELOGLEVEL         # log the most  info.
+
+           #  flag 4 may write to stdout from ./public/generic/sql_da.cxx?
+           #  flag 9 will give # sub-pools if cache debug on.
+
+           #  flag 1 = stmt
+           #  flag 2 = stmt cache
+           #  flag 3 = data dict mgr
+           #  flag 4 = exec
+           #  flag 5 = optimizer
+           #  flag 6 = remote
+           #  flag 7 = cost
+           #  flag 8 = heap handles
+           #  flag 9 = heap items
+           #  flag a = heap debug
+           #  flag b = sort/temp tables
+           #  flag c = data_t in query plan
+           #  flag d = Value Set (Statement Templates) in query plan
+           #  flag e = stored proc/trigger selected data info (e.g., sqlda).
+
+           #  flags: 123456789abcde
+           TPESQLDBG=YnnnYnYnnnnYnn;export TPESQLDBG     # stmt,opt,cost,datat  
+           PROSQLTRC=YnnnYnYnnnnYYn;export PROSQLTRC     # stmt,opt,cost,datat,VS
+                                                         # [BEST usually]
+           PROSQLTRC=YYnnYnYnnnnYYn;export PROSQLTRC     # stmt,cache,opt,cost,datat,VS
+                                                         # [shows stmt reuse by ssm]
+           PROSQLTRC=YnnnnnYnnnnnnn;export PROSQLTRC     # stmt,    cost        
+           PROSQLTRC=YnnnYnYnnnYYnn;export PROSQLTRC     # stmt,opt,cost,sort,datat
+           PROSQLTRC=YYnYYnYnnnYYnn;export PROSQLTRC     # stmt,cache,exec,opt,cost,
+                                                         #      datat,sort
+           PROSQLTRC=YnnnnnnnnnYnnn;export PROSQLTRC     # stmt,sort
+           PROSQLTRC=YnnnYnYnnnYnnn;export PROSQLTRC     # stmt,opt,cost,sort
+           PROSQLTRC=YnnnYnnnnnnnnn;export PROSQLTRC     # stmt,opt
+           PROSQLTRC=YnnYnnnnnnnnnn;export PROSQLTRC     # stmt,exec
+           PROSQLTRC=YnnYYnnnnnnnnn;export PROSQLTRC     # stmt,exec,opt
+           PROSQLTRC=YYnnYnYnnnnYnn;export PROSQLTRC     # stmt,cache,opt,cost,datat  
+           PROSQLTRC=YnnnnnnnnnnnnY;export PROSQLTRC     # stmt,sproc sqlda.
+
+
+           # Set all 3 of following env vars to get most info on Join Optimization:
+           PROSQL_OPT_IXRS_DEBUG=y;export PROSQL_OPT_IXRS_DEBUG
+           PROSQL_OPT_JOIN_DEBUG=y;export PROSQL_OPT_JOIN_DEBUG
+           PROSQL_OPT_JORD_DEBUG=y;export PROSQL_OPT_JORD_DEBUG
+
+           # To clear all debug flags:
+           unset PROSQLTRC PROSQL_OPT_IXRS_DEBUG PROSQL_OPT_JOIN_DEBUG  \
+                 PROSQL_OPT_JORD_DEBUG
+
+           # To get 1 trace output file per server thread:
+           TRACEFILE_PER_THREAD=y; export TRACEFILE_PER_THREAD
+
+           # To get trace output lines prefixed by identifying info:
+           TRACE_THREADID_PREFIX=y;export TRACE_THREADID_PREFIX
+           TRACE_DATETIME_PREFIX=y;export TRACE_DATETIME_PREFIX
+
+           # for isql common (platform independent) output formatting, esp. in regression tests:
+           PRO_ISQL_COMMON_OUTPUT=y;export PRO_ISQL_COMMON_OUTPUT
+
+           # to get more debug info from _sqlload (in sql_client.trc):
+           SQLLOAD_DEBUG=y;export SQLLOAD_DEBUG
+
+           # for Java stored procs.
+           # Provides detailed execution tracing.
+           # Output written to $cwd/sqlJavaDebug.out
+           PROJSPDBG=y;export PROJSPDBG
+ 
+
+
